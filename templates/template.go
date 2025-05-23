@@ -13,8 +13,9 @@ type ResponseTemplate struct {
 	Default     string `json:"default"`      // 默认回复模板
 
 	// 推理模型配置
-	SupportReasoning bool   `json:"support_reasoning"` // 是否支持推理功能
-	ReasoningPrefix  string `json:"reasoning_prefix"`  // 推理内容前缀
+	SupportReasoning  bool   `json:"support_reasoning"`  // 是否支持推理功能
+	ReasoningPrefix   string `json:"reasoning_prefix"`   // 推理内容前缀
+	ReasoningTemplate string `json:"reasoning_template"` // 推理内容模板
 
 	// 文本补全模型配置
 	CompletionPrefix string `json:"completion_prefix"` // 补全前缀

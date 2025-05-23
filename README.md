@@ -273,6 +273,7 @@ curl -X PUT http://localhost:8080/admin/templates/mock-gpt-3.5-turbo \
     "default": "理解了。作为模拟GPT模型，我正在提供这个模拟回复。",
     "support_reasoning": false,
     "reasoning_prefix": "",
+    "reasoning_template": "",
     "completion_prefix": ""
   }'
 ```
@@ -302,7 +303,28 @@ curl -X DELETE http://localhost:8080/admin/templates/mock-gpt-3.5-turbo
   "default": "默认回复模板",
   "support_reasoning": false,
   "reasoning_prefix": "推理前缀",
+  "reasoning_template": "推理内容模板，支持{question}占位符",
   "completion_prefix": "补全前缀"
+}
+```
+
+当配置支持推理的模型时，您可以通过以下字段自定义推理行为：
+
+- `support_reasoning`: 设置为 `true` 启用推理功能
+- `reasoning_prefix`: 在推理内容前添加的前缀
+- `reasoning_template`: 推理内容的模板文本，支持使用 `{question}` 占位符引用用户提问
+
+例如，以下是一个支持推理的模板配置：
+
+```json
+{
+  "model_id": "custom-reasoning-model",
+  "prefix": "[思考] ",
+  "greeting": "您好！我是一个支持推理的模型。",
+  "default": "根据我的分析，我提供如下回答。",
+  "support_reasoning": true,
+  "reasoning_prefix": "我的思考过程：",
+  "reasoning_template": "我需要思考这个问题：{question}\n\n首先，我会分析关键信息。\n然后，我会应用相关知识来解决问题。\n最后，我会得出合理的结论。"
 }
 ```
 
@@ -353,6 +375,7 @@ cat > custom_templates/default_templates.json << 'EOF'
     "default": "明白了。这是一个模拟回复。",
     "support_reasoning": false,
     "reasoning_prefix": "",
+    "reasoning_template": "",
     "completion_prefix": ""
   }
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"RobinPenn974/OpenAI-mocker/api"
+	"RobinPenn974/OpenAI-mocker/templates"
 )
 
 // ResponseGenerator 定义了响应生成器的通用接口
@@ -43,6 +44,14 @@ func GetCurrentTimestamp() int64 {
 func ModelFactory(modelID string) ResponseGenerator {
 	// 特殊处理推理模型
 	if modelID == "deepseek-reasoner" {
+		return NewReasoningGenerator()
+	}
+
+	// 获取模型模板
+	template := templates.GetTemplate(modelID)
+
+	// 如果模板中设置了支持推理，返回推理生成器
+	if template.SupportReasoning {
 		return NewReasoningGenerator()
 	}
 

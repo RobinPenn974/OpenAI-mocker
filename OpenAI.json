@@ -361,7 +361,7 @@
               },
               "body": {
                 "contentType": "application/json",
-                "body": "{\n  \"model_id\": \"{{model_id}}\",\n  \"prefix\": \"[自定义前缀] \",\n  \"greeting\": \"您好！我是一个模拟的GPT模型。\",\n  \"question\": \"这是一个很好的问题。作为模拟模型，我将提供以下回答...\",\n  \"help_request\": \"我很乐意帮助！尽管我只是一个模拟模型，但我可以提供回答。\",\n  \"default\": \"理解了。作为模拟GPT模型，我正在提供这个模拟回复。\",\n  \"support_reasoning\": false,\n  \"reasoning_prefix\": \"\",\n  \"completion_prefix\": \"\"\n}"
+                "body": "{\n  \"model_id\": \"{{model_id}}\",\n  \"prefix\": \"[自定义前缀] \",\n  \"greeting\": \"您好！我是一个模拟的GPT模型。\",\n  \"question\": \"这是一个很好的问题。作为模拟模型，我将提供以下回答...\",\n  \"help_request\": \"我很乐意帮助！尽管我只是一个模拟模型，但我可以提供回答。\",\n  \"default\": \"理解了。作为模拟GPT模型，我正在提供这个模拟回复。\",\n  \"support_reasoning\": false,\n  \"reasoning_prefix\": \"\",\n  \"reasoning_template\": \"\",\n  \"completion_prefix\": \"\"\n}"
               },
               "requestVariables": [
                 {

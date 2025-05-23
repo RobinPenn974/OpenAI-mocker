@@ -249,14 +249,15 @@ func createDefaultTemplatesFile(filePath string) error {
 			CompletionPrefix: "",
 		},
 		"deepseek-reasoner": {
-			ModelID:          "deepseek-reasoner",
-			Prefix:           "[DEEPSEEK] ",
-			Greeting:         "Hello! I'm a mock reasoning model. How can I assist you today?",
-			Question:         "That's an interesting question. After analyzing the problem, I've arrived at this answer. In a real reasoning model, the response would be more contextual.",
-			HelpRequest:      "I'm here to help! After careful reasoning, I can provide this simulated response. What do you need assistance with?",
-			Default:          "I understand. After careful reasoning, I'm providing this simulated response. In a real reasoning model, both the reasoning process and final answer would be more sophisticated.",
-			SupportReasoning: true,
-			ReasoningPrefix:  "REASONING: ",
+			ModelID:           "deepseek-reasoner",
+			Prefix:            "[DEEPSEEK] ",
+			Greeting:          "Hello! I'm a mock reasoning model. How can I assist you today?",
+			Question:          "That's an interesting question. After analyzing the problem, I've arrived at this answer. In a real reasoning model, the response would be more contextual.",
+			HelpRequest:       "I'm here to help! After careful reasoning, I can provide this simulated response. What do you need assistance with?",
+			Default:           "I understand. After careful reasoning, I'm providing this simulated response. In a real reasoning model, both the reasoning process and final answer would be more sophisticated.",
+			SupportReasoning:  true,
+			ReasoningPrefix:   "REASONING: ",
+			ReasoningTemplate: "Let me think step by step about this question.\n\nFirst, I need to understand what is being asked:\nThe user asked about: {question}\n\nNow I will analyze this by breaking it down:\n1. Identify key information\n2. Apply relevant knowledge\n3. Consider different angles\n4. Form a logical conclusion\n\nBased on my analysis, I can now provide a comprehensive response.",
 		},
 	}
 
@@ -283,11 +284,12 @@ func createDefaultTemplatesFile(filePath string) error {
 // getDefaultTemplate 获取默认模板
 func getDefaultTemplate(modelID string) ResponseTemplate {
 	return ResponseTemplate{
-		ModelID:     modelID,
-		Prefix:      "[MOCK] ",
-		Greeting:    "Hello! I'm a mock AI model. How can I assist you today?",
-		Question:    "That's an interesting question. As a mock model, I'll provide this simulated answer.",
-		HelpRequest: "I'm here to help! As a mock model, I can simulate responses.",
-		Default:     "I understand. I'm providing this simulated response to your message.",
+		ModelID:           modelID,
+		Prefix:            "[MOCK] ",
+		Greeting:          "Hello! I'm a mock AI model. How can I assist you today?",
+		Question:          "That's an interesting question. As a mock model, I'll provide this simulated answer.",
+		HelpRequest:       "I'm here to help! As a mock model, I can simulate responses.",
+		Default:           "I understand. I'm providing this simulated response to your message.",
+		ReasoningTemplate: "",
 	}
 }

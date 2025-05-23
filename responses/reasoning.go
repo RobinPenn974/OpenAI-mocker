@@ -58,16 +58,29 @@ func (g *ReasoningGenerator) GenerateResponse(input string, modelID string) Resp
 
 // GenerateReasoningContent 生成推理内容
 func (g *ReasoningGenerator) GenerateReasoningContent(question string, modelID string) string {
-	// 根据不同的问题输入生成不同的推理内容
-	return "Let me think step by step about this question.\n\n" +
-		"First, I need to understand what is being asked:\n" +
-		"The user asked about: " + question + "\n\n" +
-		"Now I will analyze this by breaking it down:\n" +
-		"1. Identify key information\n" +
-		"2. Apply relevant knowledge\n" +
-		"3. Consider different angles\n" +
-		"4. Form a logical conclusion\n\n" +
-		"Based on my analysis, I can now provide a comprehensive response."
+	// 获取模板
+	template := templates.GetTemplate(modelID)
+
+	// 使用模板中的推理模板，如果为空则使用默认值
+	reasoningTemplate := template.ReasoningTemplate
+
+	// 如果模板中未定义推理模板，则使用默认内容
+	if reasoningTemplate == "" {
+		reasoningTemplate = "Let me think step by step about this question.\n\n" +
+			"First, I need to understand what is being asked:\n" +
+			"The user asked about: {question}\n\n" +
+			"Now I will analyze this by breaking it down:\n" +
+			"1. Identify key information\n" +
+			"2. Apply relevant knowledge\n" +
+			"3. Consider different angles\n" +
+			"4. Form a logical conclusion\n\n" +
+			"Based on my analysis, I can now provide a comprehensive response."
+	}
+
+	// 替换内容中的占位符
+	reasoningTemplate = strings.Replace(reasoningTemplate, "{question}", question, -1)
+
+	return reasoningTemplate
 }
 
 // ShouldUseReasoningField 判断是否应该使用专门的reasoning_content字段

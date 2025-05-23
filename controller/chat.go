@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"unicode"
 
 	"RobinPenn974/OpenAI-mocker/api"
 	"RobinPenn974/OpenAI-mocker/models"
@@ -139,62 +140,253 @@ func handleStreamingChatCompletion(c *gin.Context, req api.ChatCompletionRequest
 		}
 	}
 
-	// 流式发送主要内容
-	words := strings.Split(responseContent.Content, " ")
-	chunkSize := 2 // 每次发送2个词
+	// 解析并流式发送主要内容
+	content := responseContent.Content
 
-	// 发送所有响应内容块，除了最后一块
-	for i := 0; i < len(words)-chunkSize; i += chunkSize {
-		chunk := strings.Join(words[i:i+chunkSize], " ")
-		if i == 0 {
-			chunk = strings.TrimSpace(chunk)
-		}
+	// 检查是否包含思考内容（<think>标签）
+	if strings.Contains(content, "<think>") && strings.Contains(content, "</think>") {
+		// 提取思考内容和实际回答
+		parts := strings.SplitN(content, "</think>", 2)
+		if len(parts) == 2 {
+			// 提取思考部分（移除<think>标签）
+			thinkingPart := strings.TrimPrefix(parts[0], "<think>")
+			// 提取回答部分（去除前导空白）
+			answerPart := strings.TrimSpace(parts[1])
 
-		chunkContent := chunk
-		chunkResponse := api.ChatCompletionChunkResponse{
-			ID:      responseID,
-			Object:  "chat.completion.chunk",
-			Created: now,
-			Model:   req.Model,
-			Choices: []api.ChatCompletionChunkChoice{
-				{
-					Index: 0,
-					Delta: api.ChatCompletionChunkDelta{
-						Content: &chunkContent,
+			// 流式发送思考部分
+			thinkingWords := strings.Split(thinkingPart, " ")
+			chunkSize := 3 // 思考部分每次发送3个词
+
+			// 先发送思考开始标记
+			startThinkTag := "<think>"
+			chunkResponse := api.ChatCompletionChunkResponse{
+				ID:      responseID,
+				Object:  "chat.completion.chunk",
+				Created: now,
+				Model:   req.Model,
+				Choices: []api.ChatCompletionChunkChoice{
+					{
+						Index: 0,
+						Delta: api.ChatCompletionChunkDelta{
+							Content: &startThinkTag,
+						},
 					},
 				},
-			},
-		}
+			}
+			c.SSEvent("", chunkResponse)
+			c.Writer.Flush()
+			time.Sleep(50 * time.Millisecond)
 
-		c.SSEvent("", chunkResponse)
-		c.Writer.Flush()
-		time.Sleep(100 * time.Millisecond)
+			// 发送思考内容
+			for i := 0; i < len(thinkingWords); i += chunkSize {
+				end := min(i+chunkSize, len(thinkingWords))
+				chunk := strings.Join(thinkingWords[i:end], " ")
+				if i == 0 {
+					chunk = strings.TrimSpace(chunk)
+				}
+
+				chunkContent := chunk
+				chunkResponse := api.ChatCompletionChunkResponse{
+					ID:      responseID,
+					Object:  "chat.completion.chunk",
+					Created: now,
+					Model:   req.Model,
+					Choices: []api.ChatCompletionChunkChoice{
+						{
+							Index: 0,
+							Delta: api.ChatCompletionChunkDelta{
+								Content: &chunkContent,
+							},
+						},
+					},
+				}
+
+				c.SSEvent("", chunkResponse)
+				c.Writer.Flush()
+				time.Sleep(50 * time.Millisecond)
+			}
+
+			// 发送思考结束标记
+			endThinkTag := "</think>\n\n"
+			chunkResponse = api.ChatCompletionChunkResponse{
+				ID:      responseID,
+				Object:  "chat.completion.chunk",
+				Created: now,
+				Model:   req.Model,
+				Choices: []api.ChatCompletionChunkChoice{
+					{
+						Index: 0,
+						Delta: api.ChatCompletionChunkDelta{
+							Content: &endThinkTag,
+						},
+					},
+				},
+			}
+			c.SSEvent("", chunkResponse)
+			c.Writer.Flush()
+			time.Sleep(50 * time.Millisecond)
+
+			// 接着流式发送回答部分
+			content = answerPart
+		}
 	}
 
-	// 发送最后一块响应内容
-	if len(words) > 0 {
-		lastChunk := strings.Join(words[max(0, len(words)-chunkSize):], " ")
-		lastContent := lastChunk
-		finishReason := responseContent.FinishReason
+	// 流式发送内容（思考部分处理完后的回答部分，或原始内容）
+	// 检测是否包含中文字符，或者内容较长但空格很少（通常是中文内容的特征）
+	containsChinese := false
+	for _, r := range content {
+		if unicode.Is(unicode.Han, r) {
+			containsChinese = true
+			break
+		}
+	}
 
-		chunkResponse := api.ChatCompletionChunkResponse{
-			ID:      responseID,
-			Object:  "chat.completion.chunk",
-			Created: now,
-			Model:   req.Model,
-			Choices: []api.ChatCompletionChunkChoice{
-				{
-					Index: 0,
-					Delta: api.ChatCompletionChunkDelta{
-						Content: &lastContent,
+	words := strings.Split(content, " ")
+
+	// 判断是否应该使用按字符分割的方式（适用于中文内容）
+	if containsChinese || (len(words) <= 5 && len(content) > 15) {
+		// 按字符分割，处理中文内容
+		runes := []rune(content)
+		runeChunkSize := 5 // 每次发送5个字符
+
+		// 发送除最后一块外的所有内容
+		for i := 0; i < len(runes); i += runeChunkSize {
+			end := min(i+runeChunkSize, len(runes))
+			if end == len(runes) && i+runeChunkSize >= len(runes) {
+				// 最后一块将在后面处理
+				break
+			}
+
+			chunk := string(runes[i:end])
+			chunkContent := chunk
+			chunkResponse := api.ChatCompletionChunkResponse{
+				ID:      responseID,
+				Object:  "chat.completion.chunk",
+				Created: now,
+				Model:   req.Model,
+				Choices: []api.ChatCompletionChunkChoice{
+					{
+						Index: 0,
+						Delta: api.ChatCompletionChunkDelta{
+							Content: &chunkContent,
+						},
 					},
-					FinishReason: &finishReason,
 				},
-			},
+			}
+
+			c.SSEvent("", chunkResponse)
+			c.Writer.Flush()
+			time.Sleep(50 * time.Millisecond)
 		}
 
-		c.SSEvent("", chunkResponse)
-		c.Writer.Flush()
+		// 发送最后一块
+		if len(runes) > 0 {
+			lastIndex := (len(runes) / runeChunkSize) * runeChunkSize
+			if lastIndex < len(runes) {
+				lastChunk := string(runes[lastIndex:])
+				lastContent := lastChunk
+				finishReason := responseContent.FinishReason
+
+				chunkResponse := api.ChatCompletionChunkResponse{
+					ID:      responseID,
+					Object:  "chat.completion.chunk",
+					Created: now,
+					Model:   req.Model,
+					Choices: []api.ChatCompletionChunkChoice{
+						{
+							Index: 0,
+							Delta: api.ChatCompletionChunkDelta{
+								Content: &lastContent,
+							},
+							FinishReason: &finishReason,
+						},
+					},
+				}
+
+				c.SSEvent("", chunkResponse)
+				c.Writer.Flush()
+			} else {
+				// 如果没有剩余内容，也需要发送完成状态
+				finishReason := responseContent.FinishReason
+				emptyContent := ""
+
+				chunkResponse := api.ChatCompletionChunkResponse{
+					ID:      responseID,
+					Object:  "chat.completion.chunk",
+					Created: now,
+					Model:   req.Model,
+					Choices: []api.ChatCompletionChunkChoice{
+						{
+							Index: 0,
+							Delta: api.ChatCompletionChunkDelta{
+								Content: &emptyContent,
+							},
+							FinishReason: &finishReason,
+						},
+					},
+				}
+
+				c.SSEvent("", chunkResponse)
+				c.Writer.Flush()
+			}
+		}
+	} else {
+		// 英文内容，按词分割处理
+		chunkSize := 2 // 每次发送2个词
+
+		// 发送所有响应内容块，除了最后一块
+		for i := 0; i < len(words)-chunkSize; i += chunkSize {
+			chunk := strings.Join(words[i:i+chunkSize], " ")
+			if i == 0 {
+				chunk = strings.TrimSpace(chunk)
+			}
+
+			chunkContent := chunk
+			chunkResponse := api.ChatCompletionChunkResponse{
+				ID:      responseID,
+				Object:  "chat.completion.chunk",
+				Created: now,
+				Model:   req.Model,
+				Choices: []api.ChatCompletionChunkChoice{
+					{
+						Index: 0,
+						Delta: api.ChatCompletionChunkDelta{
+							Content: &chunkContent,
+						},
+					},
+				},
+			}
+
+			c.SSEvent("", chunkResponse)
+			c.Writer.Flush()
+			time.Sleep(100 * time.Millisecond)
+		}
+
+		// 发送最后一块响应内容
+		if len(words) > 0 {
+			lastChunk := strings.Join(words[max(0, len(words)-chunkSize):], " ")
+			lastContent := lastChunk
+			finishReason := responseContent.FinishReason
+
+			chunkResponse := api.ChatCompletionChunkResponse{
+				ID:      responseID,
+				Object:  "chat.completion.chunk",
+				Created: now,
+				Model:   req.Model,
+				Choices: []api.ChatCompletionChunkChoice{
+					{
+						Index: 0,
+						Delta: api.ChatCompletionChunkDelta{
+							Content: &lastContent,
+						},
+						FinishReason: &finishReason,
+					},
+				},
+			}
+
+			c.SSEvent("", chunkResponse)
+			c.Writer.Flush()
+		}
 	}
 
 	// 发送结束事件
