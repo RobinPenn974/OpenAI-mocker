@@ -1,0 +1,525 @@
+{
+  "v": 7,
+  "name": "OpenAI",
+  "folders": [
+    {
+      "v": 7,
+      "name": "API",
+      "folders": [],
+      "requests": [
+        {
+          "v": "12",
+          "name": "模型列表",
+          "method": "GET",
+          "endpoint": "http://<<ip>>:<<port>>/v1/models",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<api_key>>"
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "12",
+          "name": "聊天完成",
+          "method": "POST",
+          "endpoint": "http://<<ip>>:<<port>>/v1/chat/completions",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<api_key>>"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"model\": \"mock-gpt-3.5-turbo\",\n  \"messages\": [{\"role\": \"user\", \"content\": \"你好\"}]\n}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "12",
+          "name": "文本完成",
+          "method": "POST",
+          "endpoint": "http://<<ip>>:<<port>>/v1/completions",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<api_key>>"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"model\": \"mock-davinci-002\",\n  \"prompt\": \"你好\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "12",
+          "name": "嵌入接口",
+          "method": "POST",
+          "endpoint": "http://<<ip>>:<<port>>/v1/embeddings",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<api_key>>"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"model\": \"mock-embedding-ada-002\",\n  \"input\": \"你好\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "12",
+          "name": "重排序接口",
+          "method": "POST",
+          "endpoint": "http://<<ip>>:<<port>>/v1/rerank",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<api_key>>"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"model\": \"mock-rerank-v1\",\n  \"query\": \"搜索查询\",\n  \"documents\": [\"文档1\", \"文档2\", \"文档3\"]\n}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "12",
+          "name": "推理模型",
+          "method": "POST",
+          "endpoint": "http://<<ip>>:<<port>>/v1/chat/completions",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<api_key>>"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"model\": \"deepseek-reasoner\",\n  \"messages\": [{\"role\": \"user\", \"content\": \"9.11 and 9.8, which is greater?\"}]\n}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "12",
+          "name": "健康检查",
+          "method": "GET",
+          "endpoint": "http://<<ip>>:<<port>>/v1/healthz",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "_ref_id": "coll_mb08m2s8_7679eaaf-e048-4321-bc0c-92ee9fcb7618"
+    },
+    {
+      "v": 7,
+      "name": "admin",
+      "folders": [
+        {
+          "v": 7,
+          "name": "模型管理",
+          "folders": [],
+          "requests": [
+            {
+              "v": "12",
+              "name": "加载模型",
+              "method": "POST",
+              "endpoint": "http://<<ip>>:<<port>>/admin/models/load",
+              "params": [],
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "preRequestScript": "",
+              "testScript": "",
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "body": {
+                "contentType": "application/json",
+                "body": "{\n  \"model_id\": \"custom-gpt-4\",\n  \"model_type\": \"chat\",\n  \"owned_by\": \"my-organization\"\n}"
+              },
+              "requestVariables": [],
+              "responses": {}
+            },
+            {
+              "v": "12",
+              "name": "卸载模型",
+              "method": "POST",
+              "endpoint": "http://<<ip>>:<<port>>/admin/models/unload",
+              "params": [],
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "preRequestScript": "",
+              "testScript": "",
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "body": {
+                "contentType": "application/json",
+                "body": "{\n  \"model_id\": \"custom-gpt-4\"\n}"
+              },
+              "requestVariables": [],
+              "responses": {}
+            },
+            {
+              "v": "12",
+              "name": "卸载所有模型",
+              "method": "POST",
+              "endpoint": "http://<<ip>>:<<port>>/admin/models/unload_all",
+              "params": [],
+              "headers": [],
+              "preRequestScript": "",
+              "testScript": "",
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "body": {
+                "contentType": null,
+                "body": null
+              },
+              "requestVariables": [],
+              "responses": {}
+            }
+          ],
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "headers": []
+        },
+        {
+          "v": 7,
+          "name": "模板管理",
+          "folders": [],
+          "requests": [
+            {
+              "v": "12",
+              "name": "列出所有模板",
+              "method": "GET",
+              "endpoint": "http://<<ip>>:<<port>>/admin/templates",
+              "params": [],
+              "headers": [],
+              "preRequestScript": "",
+              "testScript": "",
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "body": {
+                "contentType": null,
+                "body": null
+              },
+              "requestVariables": [],
+              "responses": {}
+            },
+            {
+              "v": "12",
+              "name": "获取模型模板",
+              "method": "GET",
+              "endpoint": "http://<<ip>>:<<port>>/admin/templates/{{model_id}}",
+              "params": [],
+              "headers": [],
+              "preRequestScript": "",
+              "testScript": "",
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "body": {
+                "contentType": null,
+                "body": null
+              },
+              "requestVariables": [
+                {
+                  "key": "model_id",
+                  "value": "mock-gpt-3.5-turbo"
+                }
+              ],
+              "responses": {}
+            },
+            {
+              "v": "12",
+              "name": "更新模型模板",
+              "method": "PUT",
+              "endpoint": "http://<<ip>>:<<port>>/admin/templates/{{model_id}}",
+              "params": [],
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "preRequestScript": "",
+              "testScript": "",
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "body": {
+                "contentType": "application/json",
+                "body": "{\n  \"model_id\": \"{{model_id}}\",\n  \"prefix\": \"[自定义前缀] \",\n  \"greeting\": \"您好！我是一个模拟的GPT模型。\",\n  \"question\": \"这是一个很好的问题。作为模拟模型，我将提供以下回答...\",\n  \"help_request\": \"我很乐意帮助！尽管我只是一个模拟模型，但我可以提供回答。\",\n  \"default\": \"理解了。作为模拟GPT模型，我正在提供这个模拟回复。\",\n  \"support_reasoning\": false,\n  \"reasoning_prefix\": \"\",\n  \"completion_prefix\": \"\"\n}"
+              },
+              "requestVariables": [
+                {
+                  "key": "model_id",
+                  "value": "mock-gpt-3.5-turbo"
+                }
+              ],
+              "responses": {}
+            },
+            {
+              "v": "12",
+              "name": "删除模型模板",
+              "method": "DELETE",
+              "endpoint": "http://<<ip>>:<<port>>/admin/templates/{{model_id}}",
+              "params": [],
+              "headers": [],
+              "preRequestScript": "",
+              "testScript": "",
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "body": {
+                "contentType": null,
+                "body": null
+              },
+              "requestVariables": [
+                {
+                  "key": "model_id",
+                  "value": "mock-gpt-3.5-turbo"
+                }
+              ],
+              "responses": {}
+            }
+          ],
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "headers": []
+        },
+        {
+          "v": 7,
+          "name": "认证管理",
+          "folders": [],
+          "requests": [
+            {
+              "v": "12",
+              "name": "列出API密钥",
+              "method": "GET",
+              "endpoint": "http://<<ip>>:<<port>>/admin/auth/keys",
+              "params": [],
+              "headers": [],
+              "preRequestScript": "",
+              "testScript": "",
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "body": {
+                "contentType": null,
+                "body": null
+              },
+              "requestVariables": [],
+              "responses": {}
+            },
+            {
+              "v": "12",
+              "name": "创建API密钥",
+              "method": "POST",
+              "endpoint": "http://<<ip>>:<<port>>/admin/auth/keys",
+              "params": [],
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "preRequestScript": "",
+              "testScript": "",
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "body": {
+                "contentType": "application/json",
+                "body": "{\n  \"name\": \"my-application\"\n}"
+              },
+              "requestVariables": [],
+              "responses": {}
+            },
+            {
+              "v": "12",
+              "name": "删除指定API密钥",
+              "method": "DELETE",
+              "endpoint": "http://<<ip>>:<<port>>/admin/auth/keys/{{key_id}}",
+              "params": [],
+              "headers": [],
+              "preRequestScript": "",
+              "testScript": "",
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "body": {
+                "contentType": null,
+                "body": null
+              },
+              "requestVariables": [
+                {
+                  "key": "key_id",
+                  "value": "sk-mock-xxxx"
+                }
+              ],
+              "responses": {}
+            },
+            {
+              "v": "12",
+              "name": "删除所有API密钥",
+              "method": "DELETE",
+              "endpoint": "http://<<ip>>:<<port>>/admin/auth/keys",
+              "params": [],
+              "headers": [],
+              "preRequestScript": "",
+              "testScript": "",
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "body": {
+                "contentType": null,
+                "body": null
+              },
+              "requestVariables": [],
+              "responses": {}
+            }
+          ],
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "headers": []
+        }
+      ],
+      "requests": [],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "_ref_id": "coll_mb08m7r7_ce71d073-40a0-4eed-9f11-98d53d8fc279"
+    }
+  ],
+  "requests": [],
+  "headers": [],
+  "auth": {
+    "authType": "none",
+    "authActive": true
+  },
+  "_ref_id": "coll_mb08jxgw_f6406949-3c73-4d23-b3cb-07857aa7b872"
+}
