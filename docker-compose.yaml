@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  openai-mocker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openai-mocker
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+    environment:
+      - GIN_MODE=release 
