@@ -1,0 +1,35 @@
+{
+  "mock-gpt-3.5-turbo": {
+    "model_id": "mock-gpt-3.5-turbo",
+    "prefix": "[GPT-3.5] ",
+    "greeting": "Hello! I'm a mock GPT model. How can I assist you today?",
+    "question": "That's an interesting question. As a mock model, I'll respond with this simulated answer. In a real OpenAI API, you would get a more contextual response.",
+    "help_request": "I'm here to help! Although I'm just a mock model, I can simulate responses. What do you need assistance with?",
+    "default": "I understand. As a mock GPT model, I'm providing this simulated response to your message. In a real OpenAI API, the response would be generated based on the trained model.",
+    "support_reasoning": false,
+    "reasoning_prefix": "",
+    "completion_prefix": ""
+  },
+  "mock-davinci-002": {
+    "model_id": "mock-davinci-002",
+    "prefix": "[DAVINCI] ",
+    "greeting": "there! I'm a mock AI model. How can I assist you today?",
+    "question": "That's an interesting question. As a mock model, I'll provide this simulated answer.",
+    "help_request": "is on the way! This is a simulated response from the mock completions API.",
+    "default": "As a mock AI model, I'm continuing your text with this simulated response. In a real OpenAI API, this would be generated based on the trained model.",
+    "support_reasoning": false,
+    "reasoning_prefix": "",
+    "completion_prefix": ""
+  },
+  "deepseek-reasoner": {
+    "model_id": "deepseek-reasoner",
+    "prefix": "[DEEPSEEK] ",
+    "greeting": "Hello! I'm a mock reasoning model. How can I assist you today?",
+    "question": "That's an interesting question. After analyzing the problem, I've arrived at this answer. In a real reasoning model, the response would be more contextual.",
+    "help_request": "I'm here to help! After careful reasoning, I can provide this simulated response. What do you need assistance with?",
+    "default": "I understand. After careful reasoning, I'm providing this simulated response. In a real reasoning model, both the reasoning process and final answer would be more sophisticated.",
+    "support_reasoning": true,
+    "reasoning_prefix": "REASONING: ",
+    "completion_prefix": ""
+  }
+} 

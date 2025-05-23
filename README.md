@@ -23,6 +23,10 @@
 - [模型管理](#模型管理)
   - [预设模型](#预设模型)
   - [模型管理接口](#模型管理接口)
+- [响应模板系统](#响应模板系统)
+  - [模板文件](#模板文件)
+  - [模板管理接口](#模板管理接口)
+  - [自定义模板](#自定义模板)
 - [高级功能](#高级功能)
   - [推理模型功能](#推理模型功能)
 - [技术栈](#技术栈)
@@ -38,6 +42,7 @@ OpenAI-mocker 是一个模拟 OpenAI API 接口的服务，专为开发和测试
 - ✅ 支持模型动态加载和卸载
 - ✅ 内置三种类型的虚拟模型（LLM、嵌入、重排序）
 - ✅ 简单高效的 API 密钥鉴权系统
+- ✅ 可配置的响应模板系统
 - ✅ Docker 支持，便于快速部署
 - ✅ 轻量级设计，无需外部数据库依赖
 - ✅ 支持 DeepSeek Reasoner 等推理模型的模拟
@@ -223,6 +228,135 @@ curl -X POST http://localhost:8080/admin/models/unload \
 curl -X POST http://localhost:8080/admin/models/unload_all
 ```
 
+## 响应模板系统
+
+系统提供了可自定义的响应模板功能，以控制不同模型的回复格式和内容风格。所有模板均以JSON格式存储，便于编辑和管理。
+
+### 模板文件
+
+系统使用两个主要的模板文件：
+
+- `template_data/templates.json`: 主要的模板存储文件
+- `template_data/default_templates.json`: 默认模板文件，当主文件不存在时使用
+
+### 模板管理接口
+
+您可以通过以下API管理响应模板：
+
+#### 获取所有模板
+
+```bash
+curl -X GET http://localhost:8080/admin/templates
+```
+
+#### 获取指定模型的模板
+
+```bash
+curl -X GET http://localhost:8080/admin/templates/mock-gpt-3.5-turbo
+```
+
+#### 更新指定模型的模板
+
+```bash
+curl -X PUT http://localhost:8080/admin/templates/mock-gpt-3.5-turbo \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model_id": "mock-gpt-3.5-turbo",
+    "prefix": "[自定义前缀] ",
+    "greeting": "您好！我是一个模拟的GPT模型。",
+    "question": "这是一个很好的问题。作为模拟模型，我将提供以下回答...",
+    "help_request": "我很乐意帮助！尽管我只是一个模拟模型，但我可以提供回答。",
+    "default": "理解了。作为模拟GPT模型，我正在提供这个模拟回复。",
+    "support_reasoning": false,
+    "reasoning_prefix": "",
+    "completion_prefix": ""
+  }'
+```
+
+#### 删除指定模型的模板
+
+```bash
+curl -X DELETE http://localhost:8080/admin/templates/mock-gpt-3.5-turbo
+```
+
+### 自定义模板
+
+您可以通过以下两种方式自定义模板：
+
+1. **通过API接口**：使用上述PUT接口更新指定模型的模板
+2. **直接编辑文件**：修改`template_data/templates.json`或`template_data/default_templates.json`文件
+
+模板格式如下：
+
+```json
+{
+  "model_id": "模型ID",
+  "prefix": "模型回复前缀",
+  "greeting": "问候语模板",
+  "question": "问题回答模板",
+  "help_request": "帮助请求模板",
+  "default": "默认回复模板",
+  "support_reasoning": false,
+  "reasoning_prefix": "推理前缀",
+  "completion_prefix": "补全前缀"
+}
+```
+
+### Docker卷挂载修改模板
+
+通过Docker卷挂载是修改模板最方便的方式，无需进入容器内部：
+
+#### Docker命令方式
+
+```bash
+docker run -d -p 8080:8080 \
+  -v $(pwd)/custom_templates:/app/template_data \
+  --name openai-mocker openai-mocker
+```
+
+#### Docker Compose方式
+
+```yaml
+version: '3'
+services:
+  openai-mocker:
+    image: openai-mocker
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./custom_templates:/app/template_data
+```
+
+#### 使用步骤
+
+1. 在宿主机创建模板目录
+
+```bash
+mkdir -p custom_templates
+```
+
+2. 创建或编辑default_templates.json文件
+
+```bash
+cat > custom_templates/default_templates.json << 'EOF'
+{
+  "mock-gpt-3.5-turbo": {
+    "model_id": "mock-gpt-3.5-turbo",
+    "prefix": "[GPT-3.5] ",
+    "greeting": "您好！我是模拟模型。有什么可以帮助您？",
+    "question": "这是个好问题。作为模拟模型，我给出以下回答。",
+    "help_request": "我很乐意帮忙！请告诉我您需要什么。",
+    "default": "明白了。这是一个模拟回复。",
+    "support_reasoning": false,
+    "reasoning_prefix": "",
+    "completion_prefix": ""
+  }
+}
+EOF
+```
+
+3. 启动服务后，所有修改会立即生效
+
 ## 高级功能
 
 ### 推理模型功能
@@ -272,7 +406,7 @@ curl -X POST http://localhost:8080/v1/chat/completions \
 
 - **后端框架**：Gin
 - **编程语言**：Go
-- **存储方式**：内存存储（无需外部数据库）
+- **存储方式**：内存存储 + JSON文件 (无需外部数据库)
 - **容器化**：Docker & Docker Compose
 
 ## 注意事项

@@ -2,6 +2,8 @@ package responses
 
 import (
 	"strings"
+
+	"RobinPenn974/OpenAI-mocker/templates"
 )
 
 // CompletionGenerator 文本补全模型响应生成器
@@ -14,18 +16,19 @@ func NewCompletionGenerator() *CompletionGenerator {
 
 // GenerateResponse 根据输入生成文本补全响应
 func (g *CompletionGenerator) GenerateResponse(prompt string, modelID string) ResponseContent {
-	prefix := getModelPrefix(modelID)
+	// 获取模型的响应模板
+	template := templates.GetTemplate(modelID)
 	var responseText string
 
 	// 根据输入内容构造简单回复
 	if strings.Contains(strings.ToLower(prompt), "hello") || strings.Contains(strings.ToLower(prompt), "hi") {
-		responseText = prefix + "there! I'm a mock AI model. How can I assist you today?"
+		responseText = template.Prefix + template.Greeting
 	} else if strings.Contains(strings.ToLower(prompt), "help") {
-		responseText = prefix + "is on the way! This is a simulated response from the mock completions API."
+		responseText = template.Prefix + template.HelpRequest
 	} else if strings.Contains(strings.ToLower(prompt), "?") {
-		responseText = prefix + "That's an interesting question. As a mock model, I'll provide this simulated answer."
+		responseText = template.Prefix + template.Question
 	} else {
-		responseText = prefix + "As a mock AI model, I'm continuing your text with this simulated response. In a real OpenAI API, this would be generated based on the trained model."
+		responseText = template.Prefix + template.Default
 	}
 
 	return ResponseContent{

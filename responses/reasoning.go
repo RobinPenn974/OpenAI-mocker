@@ -3,6 +3,8 @@ package responses
 import (
 	"os"
 	"strings"
+
+	"RobinPenn974/OpenAI-mocker/templates"
 )
 
 // ReasoningGenerator 推理模型响应生成器
@@ -15,22 +17,23 @@ func NewReasoningGenerator() *ReasoningGenerator {
 
 // GenerateResponse 根据输入生成推理模型的响应
 func (g *ReasoningGenerator) GenerateResponse(input string, modelID string) ResponseContent {
-	prefix := getModelPrefix(modelID)
+	// 获取模型的响应模板
+	template := templates.GetTemplate(modelID)
 
 	// 生成推理内容
 	reasoningContent := g.GenerateReasoningContent(input, modelID)
-	reasoningContent = prefix + "REASONING: " + reasoningContent
+	reasoningContent = template.Prefix + template.ReasoningPrefix + reasoningContent
 
 	// 生成常规回复内容
 	var responseText string
 	if strings.Contains(strings.ToLower(input), "hello") || strings.Contains(strings.ToLower(input), "hi") {
-		responseText = prefix + "Hello! I'm a mock reasoning model. How can I assist you today?"
+		responseText = template.Prefix + template.Greeting
 	} else if strings.Contains(strings.ToLower(input), "help") {
-		responseText = prefix + "I'm here to help! After careful reasoning, I can provide this simulated response. What do you need assistance with?"
+		responseText = template.Prefix + template.HelpRequest
 	} else if strings.Contains(strings.ToLower(input), "?") {
-		responseText = prefix + "That's an interesting question. After analyzing the problem, I've arrived at this answer. In a real reasoning model, the response would be more contextual."
+		responseText = template.Prefix + template.Question
 	} else {
-		responseText = prefix + "I understand. After careful reasoning, I'm providing this simulated response. In a real reasoning model, both the reasoning process and final answer would be more sophisticated."
+		responseText = template.Prefix + template.Default
 	}
 
 	// 根据环境变量决定如何处理推理内容

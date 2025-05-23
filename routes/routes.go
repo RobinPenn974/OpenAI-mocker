@@ -45,6 +45,13 @@ func SetupRoutes(r *gin.Engine) {
 		models.POST("/unload", controller.HandleUnloadModel)
 		models.POST("/unload_all", controller.HandleUnloadAllModels)
 
+		// 模板管理
+		templates := admin.Group("/templates")
+		templates.GET("", controller.HandleListTemplates)
+		templates.GET("/:model_id", controller.HandleGetTemplate)
+		templates.PUT("/:model_id", controller.HandleUpdateTemplate)
+		templates.DELETE("/:model_id", controller.HandleDeleteTemplate)
+
 		// 认证管理
 		auth := admin.Group("/auth")
 		auth.GET("/keys", controller.HandleListApiKeys)
